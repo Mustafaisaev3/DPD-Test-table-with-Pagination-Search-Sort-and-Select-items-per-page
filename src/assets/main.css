@@ -1,0 +1,11 @@
+@font-face {
+  font-family: 'MyriadPro';
+  src: url('./fonts/8141.otf') format('otf'),
+       url('./fonts/8143.otf') format('otf'),
+       url('./fonts/8145.otf') format('otf'),
+       url('./fonts/8147.otf') format('otf'),
+       url('./fonts/8149.otf') format('otf'),
+       url('./fonts/8159.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
