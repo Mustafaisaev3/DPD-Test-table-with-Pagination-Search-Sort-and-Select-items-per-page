@@ -68,7 +68,6 @@ watch(route, () => {
   const response = useData(users, route.query)
   data = response.data
   pagination = response.pagination
-  // console.log(data, route.query, 'users----')
 
 }, { deep: true });
 

@@ -8,11 +8,6 @@ export interface IQuery {
   sorted?: string;
 }
 
-export interface IUseData {
-  data: any[],
-  query: IQuery
-}
-
 export enum SORTING_TYPE {
   'ASC',
   'DSC'
@@ -42,7 +37,7 @@ export function useData (data: any[], query: IQuery) {
     sorted = query.sorted
   }
 
-  // Searching functionality
+  // Функционал поиска
   function search(arr: any, searchTerm: string, excludedFields: string[] = []) {
     return arr.filter((item: any) => searchInObject(item, searchTerm, excludedFields));
   }
@@ -72,26 +67,13 @@ export function useData (data: any[], query: IQuery) {
     data = search(data, q, ['picture', 'registered', 'dob', 'login', 'nat'])
   }
 
-  // Sorting functionality
+
+  // Функционал сортировки
 
   function sorting(col: string, order = 'ASC') {
     return data.sort((a, b) => {
-      // let keyArr = col.split('.')
-  
-      // if (keyArr.length > 1) {
-      //   return sort(aValue, 'anotherKey', order) - sort(bValue, 'anotherKey', order);
-      // }
-      // if (typeof aValue === 'object' && typeof bValue === 'object') {
-      //   return sort(aValue, 'anotherKey', order) - sort(bValue, 'anotherKey', order);
-      // }
-
-      // const aValue = a[col];
-      // const bValue = b[col];
-
       const aValue = getValueByPath(a, col);
       const bValue = getValueByPath(b, col);
-
-      console.log(aValue)
   
       if (typeof aValue === 'string') {
         return aValue.localeCompare(bValue) * (order === 'ASC' ? 1 : -1);
@@ -123,7 +105,6 @@ export function useData (data: any[], query: IQuery) {
   const hasNextPage = end < data.length
   const hasPrevPage = start > 0
   const pageCount = Math.round(data.length / perPage)
-  // const currentPage = parseInt(`${page}`)
   const currentPage = parseInt(`${page}`) > pageCount ? 1 : parseInt(`${page}`)
 
   data = data.slice(start, end)
