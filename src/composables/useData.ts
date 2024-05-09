@@ -1,66 +1,42 @@
-
-
 export interface IQuery {
   page?: number,
   perPage?: number,
-  q?: string;
-  sortedCol?: string;
-  sorted?: string;
+  q?: string,
+  sortedCol?: string,
+  sorted?: SORTING_TYPE,
 }
 
 export enum SORTING_TYPE {
-  'ASC',
-  'DSC'
+  ASC = 'ASC',
+  DSC = 'DSC',
 }
 
-export function useData (data: any[], query: IQuery) {
-  let page = 1
-  let perPage = 20
-  let q = ''
-  let sortedCol = ''
-  let sorted = ''
+export function useData (data: any[], { page, perPage, q, sortedCol, sorted }: IQuery) {
+  page = page || 1;
+  perPage = perPage || 20;
+  q = q || '';
+  sortedCol = sortedCol || '';
+  sorted = sorted || SORTING_TYPE.ASC;
 
-  if (query && query.page) {
-    page = query.page
-  }
-
-  if (query && query.perPage) {
-    perPage = query.perPage
-  }
-
-  if (query && query.q) {
-    q = query.q
-  }
-
-  if (query && (query.sortedCol && query.sorted)) {
-    sortedCol = query.sortedCol
-    sorted = query.sorted
-  }
 
   // Функционал поиска
   function search(arr: any, searchTerm: string, excludedFields: string[] = []) {
     return arr.filter((item: any) => searchInObject(item, searchTerm, excludedFields));
   }
 
-  function searchInObject(obj: any, searchTerm: string, excludedFields: string[] = []) {
+  function searchInObject(obj: any, searchTerm: string, excludedFields: string[] = []): boolean {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    for (let key in obj) {
-      // Пропускаем исключенные поля
-      if (excludedFields.includes(key)) {
-        continue;
+    return Object.keys(obj).some((key) => {
+      if (excludedFields.includes(key)) return false;
+      const value = obj[key];
+      if (typeof value === 'object' && value !== null) {
+        return searchInObject(value, searchTerm, excludedFields);
       }
-      if (typeof obj[key] === 'object') {
-        // Рекурсивно обходим вложенные свойства
-        if (searchInObject(obj[key], searchTerm, excludedFields)) {
-          return true;
-        }
-      } else if (typeof obj[key] === 'string' && obj[key].toLowerCase().includes(lowerCaseSearchTerm)) {
-        // Нашли искомую строку
-        return true;
+      if (typeof value === 'string') {
+        return value.toLowerCase().includes(lowerCaseSearchTerm);
       }
-    }
-    // Искомая строка не найдена
-    return false;
+      return false;
+    });
   }
 
   if (q.length > 0) {
@@ -70,16 +46,16 @@ export function useData (data: any[], query: IQuery) {
 
   // Функционал сортировки
 
-  function sorting(col: string, order = 'ASC') {
+  function sorting(col: string, order: SORTING_TYPE) {
     return data.sort((a, b) => {
       const aValue = getValueByPath(a, col);
       const bValue = getValueByPath(b, col);
-  
-      if (typeof aValue === 'string') {
-        return aValue.localeCompare(bValue) * (order === 'ASC' ? 1 : -1);
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return aValue.localeCompare(bValue) * (order === SORTING_TYPE.ASC ? 1 : -1);
       }
-  
-      return (aValue - bValue) * (order === 'ASC' ? 1 : -1);
+
+      return (aValue - bValue) * (order === SORTING_TYPE.ASC ? 1 : -1);
     });
   }
 
